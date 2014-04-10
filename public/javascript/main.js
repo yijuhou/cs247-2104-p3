@@ -5,6 +5,8 @@
 
   var cur_video_blob = null;
   var fb_instance;
+  var mediaRecorder;
+  var filter_class = "none";
 
   $(document).ready(function(){
     connect_to_chat_firebase();
@@ -50,6 +52,7 @@
     $("#submission input").keydown(function( event ) {
       if (event.which == 13) {
         if(has_emotions($(this).val())){
+          //mediaRecorder.stop();
           fb_instance_stream.push({m:username+": " +$(this).val(), v:cur_video_blob, c: my_color});
         }else{
           fb_instance_stream.push({m:username+": " +$(this).val(), c: my_color});
@@ -59,6 +62,23 @@
       }
     });
 
+    //Match with RegExp
+    $("#submission input").keyup(function( event ) {
+      var happy = /:\)|:-\)|great|cool|yeah/i;
+      var sad = /:\(|:-\(/;
+      var scared = /What!|What?|OMG|!!!/;
+
+      if (happy.test($(this).val())){
+        mediaRecorder.start(3000);
+        filter_class = "happy";
+      }else if (sad.test($(this).val())){
+        mediaRecorder.start(3000);
+        filter_class = "sad";
+      }else if (scared.test($(this).val())){
+        mediaRecorder.start(3000);
+        filter_class = "scared";
+      }
+    });
     // scroll to bottom in case there is already content
     scroll_to_bottom(1300);
   }
@@ -73,6 +93,7 @@
       video.controls = false; // optional
       video.loop = true;
       video.width = 120;
+      video.className = filter_class;
 
       var source = document.createElement("source");
       source.src =  URL.createObjectURL(base64_to_blob(data.v));
@@ -129,7 +150,7 @@
 
       // now record stream in 5 seconds interval
       var video_container = document.getElementById('video_container');
-      var mediaRecorder = new MediaStreamRecorder(stream);
+      mediaRecorder = new MediaStreamRecorder(stream);
       var index = 1;
 
       mediaRecorder.mimeType = 'video/webm';
@@ -147,10 +168,10 @@
             cur_video_blob = b64_data;
           });
       };
-      setInterval( function() {
+      /*setInterval( function() {
         mediaRecorder.stop();
         mediaRecorder.start(3000);
-      }, 3000 );
+      }, 3000 );*/
       console.log("connect to media stream!");
     }
 
@@ -165,13 +186,15 @@
 
   // check to see if a message qualifies to be replaced with video.
   var has_emotions = function(msg){
-    var options = ["lol",":)",":("];
-    for(var i=0;i<options.length;i++){
+    //var options = ["lol",":)",":("];
+    var match = /:\)|:-\)|great|cool|yeah|:\(|:-\(|What!|What?|OMG|!!!/i;
+    /*for(var i=0;i<options.length;i++){
       if(msg.indexOf(options[i])!= -1){
         return true;
       }
     }
-    return false;
+    return false;*/
+    return match.test(msg);
   }
 
 
