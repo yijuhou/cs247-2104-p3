@@ -127,6 +127,10 @@
     },wait_time);
   }
 
+  elem.addEventListener("click", myfunc(){
+    
+  });
+
   function connect_webcam(){
     // we're only recording video, not audio
     var mediaConstraints = {
