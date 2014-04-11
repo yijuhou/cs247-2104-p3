@@ -52,7 +52,6 @@
     $("#submission input").keydown(function( event ) {
       if (event.which == 13) {
         if(has_emotions($(this).val())){
-          //mediaRecorder.stop();
           fb_instance_stream.push({m:username+": " +$(this).val(), v:cur_video_blob, c: my_color, css: filter_class});
         }else{
           fb_instance_stream.push({m:username+": " +$(this).val(), c: my_color});
@@ -89,6 +88,7 @@
     var second_counter = document.getElementById('second_counter');
     mediaRecorder.start(1000);
     second_counter.innerHTML = "R";
+    document.getElementById('webcam_stream').firstChild.className = "recording";
     var second_counter_update = setTimeout(function(){
       second_counter.innerHTML = "";
     },1000);
@@ -150,14 +150,9 @@
           src: URL.createObjectURL(stream)
       });
       video.play();
-      webcam_stream.appendChild(video);
+      video.className = "not-recording";
 
-      // counter
-      /*var time = 0;
-      var second_counter = document.getElementById('second_counter');
-      var second_counter_update = setInterval(function(){
-        second_counter.innerHTML = time++;
-      },1000);*/
+      webcam_stream.appendChild(video);
 
       // now record stream in 5 seconds interval
       var video_container = document.getElementById('video_container');
@@ -173,16 +168,12 @@
       mediaRecorder.ondataavailable = function (blob) {
           //console.log("new data available!");
           video_container.innerHTML = "";
-          console.log("ready");
+          webcam_stream.firstChild.className = "not-recording";
           // convert data into base 64 blocks
           blob_to_base64(blob,function(b64_data){
             cur_video_blob = b64_data;
           });
       };
-      /*setInterval( function() {
-        mediaRecorder.stop();
-        mediaRecorder.start(3000);
-      }, 3000 );*/
       console.log("connect to media stream!");
     }
 
@@ -197,14 +188,7 @@
 
   // check to see if a message qualifies to be replaced with video.
   var has_emotions = function(msg){
-    //var options = ["lol",":)",":("];
     var match = /:\)|:-\)|great|cool|yeah|:\(|:-\(|What!|What?|OMG|!!!/i;
-    /*for(var i=0;i<options.length;i++){
-      if(msg.indexOf(options[i])!= -1){
-        return true;
-      }
-    }
-    return false;*/
     return match.test(msg);
   }
 
