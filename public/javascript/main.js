@@ -53,7 +53,7 @@
       if (event.which == 13) {
         if(has_emotions($(this).val())){
           //mediaRecorder.stop();
-          fb_instance_stream.push({m:username+": " +$(this).val(), v:cur_video_blob, c: my_color});
+          fb_instance_stream.push({m:username+": " +$(this).val(), v:cur_video_blob, c: my_color, css: filter_class});
         }else{
           fb_instance_stream.push({m:username+": " +$(this).val(), c: my_color});
         }
@@ -66,21 +66,32 @@
     $("#submission input").keyup(function( event ) {
       var happy = /:\)|:-\)|great|cool|yeah/i;
       var sad = /:\(|:-\(/;
-      var scared = /What!|What?|OMG|!!!/;
+      var scared = /What!|What?|OMG|!!!/i;
 
-      if (happy.test($(this).val())){
-        mediaRecorder.start(3000);
+      input_str = $(this).val();
+      if (input_str.length > 5) input_str = input_str.substring(input_str.length - 5);
+      if (happy.test(input_str)){
+        record_video();
         filter_class = "happy";
-      }else if (sad.test($(this).val())){
-        mediaRecorder.start(3000);
+      }else if (sad.test(input_str)){
+        record_video();
         filter_class = "sad";
-      }else if (scared.test($(this).val())){
-        mediaRecorder.start(3000);
+      }else if (scared.test(input_str)){
+        record_video();
         filter_class = "scared";
       }
     });
     // scroll to bottom in case there is already content
     scroll_to_bottom(1300);
+  }
+
+  function record_video(){
+    var second_counter = document.getElementById('second_counter');
+    mediaRecorder.start(1000);
+    second_counter.innerHTML = "R";
+    var second_counter_update = setTimeout(function(){
+      second_counter.innerHTML = "";
+    },1000);
   }
 
   // creates a message node and appends it to the conversation
@@ -93,7 +104,7 @@
       video.controls = false; // optional
       video.loop = true;
       video.width = 120;
-      video.className = filter_class;
+      video.className = data.css;
 
       var source = document.createElement("source");
       source.src =  URL.createObjectURL(base64_to_blob(data.v));
@@ -142,11 +153,11 @@
       webcam_stream.appendChild(video);
 
       // counter
-      var time = 0;
+      /*var time = 0;
       var second_counter = document.getElementById('second_counter');
       var second_counter_update = setInterval(function(){
         second_counter.innerHTML = time++;
-      },1000);
+      },1000);*/
 
       // now record stream in 5 seconds interval
       var video_container = document.getElementById('video_container');
@@ -162,7 +173,7 @@
       mediaRecorder.ondataavailable = function (blob) {
           //console.log("new data available!");
           video_container.innerHTML = "";
-
+          console.log("ready");
           // convert data into base 64 blocks
           blob_to_base64(blob,function(b64_data){
             cur_video_blob = b64_data;
