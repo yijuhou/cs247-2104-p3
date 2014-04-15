@@ -64,7 +64,7 @@
     //Match with RegExp
     $("#submission input").keyup(function( event ) {
       var happy = /:\)|:-\)|great|cool|yeah/i;
-      var sad = /:\(|:-\(/;
+      var sad = /:\(|:-\(|sad/i;
       var scared = /What!|What?|OMG|!!!/i;
 
       input_str = $(this).val();
@@ -188,7 +188,7 @@
 
   // check to see if a message qualifies to be replaced with video.
   var has_emotions = function(msg){
-    var match = /:\)|:-\)|great|cool|yeah|:\(|:-\(|What!|What?|OMG|!!!/i;
+    var match = /:\)|:-\)|great|cool|yeah|:\(|:-\(|sad|What!|What?|OMG|!!!/i;
     return match.test(msg);
   }
 
